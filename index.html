@@ -398,6 +398,12 @@ function parsePrice(str){
   return match ? parseFloat(match[0]) : 0;
 }
 
+function extraTotal(card){
+  const count = parseFloat(card.extraCount) || 0;
+  const rate = parsePrice(card.extraRate);
+  return count * rate;
+}
+
 function formatMoney(n){
   return '$' + n.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -581,8 +587,8 @@ function renderBoard(){
     }
     cardsHere.forEach(card => list.appendChild(renderCard(card, cat)));
 
-    if(status.id === 'completed' && cardsHere.length > 0){
-      const total = cardsHere.reduce((sum, c) => sum + parsePrice(c.price), 0);
+    if((status.id === 'confirmed' || status.id === 'completed') && cardsHere.length > 0){
+      const total = cardsHere.reduce((sum, c) => sum + parsePrice(c.price) + extraTotal(c), 0);
       const footer = document.createElement('div');
       footer.className = 'column-footer';
       footer.textContent = `Total: ${formatMoney(total)}`;
@@ -638,12 +644,14 @@ function renderCard(card, cat){
   if(card.pax) tags.push(`${card.pax} pax`);
   if(card.price) tags.push(card.price);
   if(card.source) tags.push(`via ${card.source}`);
+  if(parseFloat(card.extraCount) > 0) tags.push(`+${card.extraCount} extra (${formatMoney(extraTotal(card))})`);
 
   el.innerHTML = `
     ${!isViewer ? '<button class="card-del" title="Delete booking">✕</button>' : ''}
     <div class="card-client">${escapeHtml(card.client)}</div>
     ${dateLine ? `<div class="card-line">${escapeHtml(dateLine)}</div>` : ''}
     ${card.location ? `<div class="card-line">${escapeHtml(card.location)}</div>` : ''}
+    ${card.staff ? `<div class="card-line">Staff: ${escapeHtml(card.staff)}</div>` : ''}
     ${tags.length ? `<div class="card-tags">${tags.map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
     ${invoiceBadgeHtml(card)}
     ${checklistBadgeHtml(card)}
@@ -759,6 +767,8 @@ function openBookingModal(card){
           <div class="readonly-row"><span>Location</span>${escapeHtml(card.location || '—')}</div>
           <div class="readonly-row"><span>PAX</span>${escapeHtml(card.pax || '—')}</div>
           <div class="readonly-row"><span>Price</span>${escapeHtml(card.price || '—')}</div>
+          <div class="readonly-row"><span>Extras</span>${parseFloat(card.extraCount) > 0 ? escapeHtml(`${card.extraCount} × ${card.extraRate || '—'} = ${formatMoney(extraTotal(card))}`) : '—'}</div>
+          ${card.staff ? `<div class="readonly-row"><span>Staff assigned</span>${escapeHtml(card.staff)}</div>` : ''}
           <div class="readonly-row"><span>Notes</span>${escapeHtml(card.notes || '—')}</div>
           <div class="modal-actions"><div></div><button class="btn-ghost" id="cancelBtn">Close</button></div>
         </div>
@@ -815,6 +825,23 @@ function openBookingModal(card){
             <input id="f-price" type="text" placeholder="e.g. $650" value="${editing ? escapeHtml(card.price || '') : ''}">
           </div>
         </div>
+        <div class="field">
+          <label>Extras (extra kids / extra guests)</label>
+          <div class="field-row">
+            <div class="field">
+              <input id="f-extra-count" type="text" placeholder="Extra count (e.g. 3)" value="${editing ? escapeHtml(card.extraCount || '') : ''}">
+            </div>
+            <div class="field">
+              <input id="f-extra-rate" type="text" placeholder="Rate per extra (e.g. $8)" value="${editing ? escapeHtml(card.extraRate || '') : ''}">
+            </div>
+          </div>
+          <div class="card-line" id="extraTotalPreview">Extra total: $0.00</div>
+        </div>
+        ${(editing && (card.status === 'staffed' || card.status === 'completed')) ? `
+        <div class="field">
+          <label for="f-staff">Staff assigned</label>
+          <input id="f-staff" type="text" placeholder="e.g. Sarah, Mike" value="${escapeHtml(card.staff || '')}">
+        </div>` : ''}
         ${invoiceFieldsHtml(editing ? card : null)}
         <div class="field">
           <label for="f-notes">Notes</label>
@@ -833,6 +860,18 @@ function openBookingModal(card){
   `;
 
   const getChosenColor = wireColorPicker(document.getElementById('cardColorPicker'), initialColor, () => {});
+
+  const extraCountEl = document.getElementById('f-extra-count');
+  const extraRateEl = document.getElementById('f-extra-rate');
+  const extraPreviewEl = document.getElementById('extraTotalPreview');
+  function updateExtraPreview(){
+    const count = parseFloat(extraCountEl.value) || 0;
+    const rate = parsePrice(extraRateEl.value);
+    extraPreviewEl.textContent = `Extra total: ${formatMoney(count * rate)}`;
+  }
+  extraCountEl.addEventListener('input', updateExtraPreview);
+  extraRateEl.addEventListener('input', updateExtraPreview);
+  updateExtraPreview();
 
   document.getElementById('cancelBtn').onclick = closeModal;
   document.getElementById('overlay').addEventListener('click', (e) => { if(e.target.id === 'overlay') closeModal(); });
@@ -864,6 +903,8 @@ function openBookingModal(card){
       location: document.getElementById('f-location').value.trim(),
       pax: document.getElementById('f-pax').value.trim(),
       price: document.getElementById('f-price').value.trim(),
+      extraCount: document.getElementById('f-extra-count').value.trim(),
+      extraRate: document.getElementById('f-extra-rate').value.trim(),
       notes: document.getElementById('f-notes').value.trim(),
       diSent: document.getElementById('f-di-sent').checked,
       diPaid: document.getElementById('f-di-paid').checked,
@@ -872,6 +913,8 @@ function openBookingModal(card){
       addedConnecteam: document.getElementById('f-added-connecteam').checked,
       addedMasterSheet: document.getElementById('f-added-mastersheet').checked,
     };
+    const staffEl = document.getElementById('f-staff');
+    data.staff = staffEl ? staffEl.value.trim() : (editing ? (card.staff || '') : '');
     if(editing){
       Object.assign(card, data);
       card.updatedAt = Date.now();
