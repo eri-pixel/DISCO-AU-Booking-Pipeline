@@ -170,6 +170,7 @@
   .card-tag.tag-paid{ background: var(--green-bg); color:var(--green); border-color:var(--green-bd); }
   .card-tag.tag-sent{ background: var(--amber-bg); color:var(--amber-tx); border-color:var(--amber-bd); }
   .card-overdue-flag{ color: var(--red); font-size:10.5px; font-weight:700; margin-top:6px; display:flex; align-items:center; gap:4px; }
+  .followup-countdown{ color: var(--sky); font-size:10.5px; font-weight:700; margin-top:6px; display:flex; align-items:center; gap:4px; }
   .card-del{
     position:absolute; top:8px; right:8px; background:none; border:none;
     color: var(--muted-2); font-size:13px; cursor:pointer; line-height:1; padding:4px;
@@ -265,7 +266,7 @@ const CONFIG = {
 const STATUSES = [
   { id:'enquiry',     label:'Enquiry' },
   { id:'quoted',      label:'Quoted' },
-  { id:'awaiting',    label:'Awaiting Client' },
+  { id:'awaiting',    label:'Follow-up Sent' },
   { id:'no_response', label:'No Response' },
   { id:'confirmed',   label:'Confirmed' },
   { id:'staffed',     label:'Staffed' },
@@ -273,6 +274,7 @@ const STATUSES = [
   { id:'cancelled',   label:'Cancelled' },
 ];
 const CLOSED_STATUSES = ['completed', 'cancelled'];
+const FOLLOWUP_STATUSES = ['enquiry', 'quoted', 'awaiting'];
 const SOURCES = ['Email', 'Form', 'Referral', 'Website', 'CrowdPleaser'];
 
 const PALETTE = ['pink','teal','amber','indigo','coral','sky'];
@@ -442,8 +444,21 @@ function renderViewerBanner(){
 }
 
 function isOverdue(card){
-  if(CLOSED_STATUSES.includes(card.status)) return false;
-  return (Date.now() - (card.updatedAt || 0)) > SEVEN_DAYS_MS;
+  if(!FOLLOWUP_STATUSES.includes(card.status)) return false;
+  return daysLeftForFollowup(card) <= 0;
+}
+
+function daysLeftForFollowup(card){
+  const elapsedMs = Date.now() - (card.updatedAt || 0);
+  const elapsedDays = Math.floor(elapsedMs / (24 * 60 * 60 * 1000));
+  return 7 - elapsedDays;
+}
+
+function followupIndicatorHtml(card){
+  if(!FOLLOWUP_STATUSES.includes(card.status)) return '';
+  if(isOverdue(card)) return '<div class="card-overdue-flag">⏱ Follow up — no update in 7+ days</div>';
+  const daysLeft = daysLeftForFollowup(card);
+  return `<div class="followup-countdown">⏳ ${daysLeft} day${daysLeft === 1 ? '' : 's'} left to follow up</div>`;
 }
 
 function render(){
@@ -655,7 +670,7 @@ function renderCard(card, cat){
     ${tags.length ? `<div class="card-tags">${tags.map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
     ${invoiceBadgeHtml(card)}
     ${checklistBadgeHtml(card)}
-    ${isOverdue(card) ? '<div class="card-overdue-flag">⏱ Follow up — no update in 7+ days</div>' : ''}
+    ${followupIndicatorHtml(card)}
   `;
 
   if(!isViewer){
@@ -847,7 +862,9 @@ function openBookingModal(card){
           <label for="f-notes">Notes</label>
           <textarea id="f-notes" placeholder="Special requests...">${editing ? escapeHtml(card.notes || '') : ''}</textarea>
         </div>
-        ${editing ? '<button class="btn-link" id="resetTimerBtn">Reset follow-up timer (mark as followed up today)</button>' : ''}
+        ${(editing && FOLLOWUP_STATUSES.includes(card.status)) ? `
+        <div class="card-line" style="margin-bottom:8px;">${isOverdue(card) ? '⏱ Follow-up overdue' : `⏳ ${daysLeftForFollowup(card)} day${daysLeftForFollowup(card) === 1 ? '' : 's'} left to follow up`}</div>
+        <button class="btn-link" id="resetTimerBtn">Reset follow-up timer (mark as followed up today)</button>` : ''}
         <div class="modal-actions">
           <div>${editing ? '<button class="btn-danger" id="deleteBtn">Delete</button>' : ''}</div>
           <div class="modal-actions-right">
@@ -883,11 +900,11 @@ function openBookingModal(card){
         saveState(); render();
       });
     };
-    document.getElementById('resetTimerBtn').onclick = () => {
+    document.getElementById('resetTimerBtn')?.addEventListener('click', () => {
       card.updatedAt = Date.now();
       saveState(); closeModal(); render();
       showToast('Follow-up timer reset');
-    };
+    });
   }
 
   document.getElementById('saveBtn').onclick = () => {
@@ -987,8 +1004,16 @@ function openAddCategoryModal(){
 
 function closeModal(){ document.getElementById('modalRoot').innerHTML = ''; }
 
+function todayLocalISO(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 function checkSessionsToday(){
-  const todayISO = new Date().toISOString().slice(0,10);
+  const todayISO = todayLocalISO();
   const sessions = state.cards.filter(c => c.eventDate === todayISO && c.status !== 'cancelled');
   if(sessions.length === 0) return;
   const root = document.getElementById('modalRoot');
