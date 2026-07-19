@@ -140,6 +140,14 @@
   .note-edit:hover, .note-edit-link:hover{ background:var(--pink); color:#fff; }
 
   .board{ display:flex; gap:14px; align-items:flex-start; }
+  .all-bookings-list{ display:flex; flex-direction:column; gap:8px; width:100%; max-width:640px; }
+  .all-booking-row{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background: var(--panel-2); border:1.5px solid var(--border); border-left-width:5px; border-radius:12px;
+    padding:11px 14px; cursor:pointer; transition: border-color .12s ease;
+  }
+  .all-booking-row:hover{ border-color: var(--sky); }
+  .all-booking-main{ flex:1; min-width:0; }
   .column{
     background: var(--panel); border:1.5px solid var(--border); border-radius:14px;
     width: 246px; min-width:246px; display:flex; flex-direction:column; max-height:100%;
@@ -264,16 +272,18 @@ const CONFIG = {
 };
 
 const STATUSES = [
-  { id:'enquiry',     label:'Enquiry' },
-  { id:'quoted',      label:'Quoted' },
-  { id:'awaiting',    label:'Follow-up Sent' },
-  { id:'no_response', label:'No Response' },
-  { id:'confirmed',   label:'Confirmed' },
-  { id:'staffed',     label:'Staffed' },
-  { id:'completed',   label:'Completed' },
-  { id:'cancelled',   label:'Cancelled' },
+  { id:'enquiry',            label:'Enquiry' },
+  { id:'quoted',             label:'Quoted' },
+  { id:'awaiting',           label:'Follow-up Sent' },
+  { id:'no_response',        label:'No Response' },
+  { id:'awaiting_response',  label:'Awaiting for Response' },
+  { id:'confirmed',          label:'Confirmed' },
+  { id:'staffed',            label:'Staffed' },
+  { id:'completed',          label:'Completed' },
+  { id:'cancelled',          label:'Cancelled' },
+  { id:'archive',            label:'Archive' },
 ];
-const CLOSED_STATUSES = ['completed', 'cancelled'];
+const CLOSED_STATUSES = ['completed', 'cancelled', 'archive'];
 const FOLLOWUP_STATUSES = ['enquiry', 'quoted', 'awaiting'];
 const SOURCES = ['Email', 'Form', 'Referral', 'Website', 'CrowdPleaser'];
 
@@ -417,12 +427,13 @@ function noteDisplay(note){
 function renderHeaderActions(){
   const el = document.getElementById('headerActions');
   if(isViewer){ el.innerHTML = ''; return; }
+  const showAdd = activeCategoryId !== 'ALL';
   el.innerHTML = `
     <button class="btn-share" id="editKeyBtn" data-focusable>🔑 Edit key</button>
     <button class="btn-share" id="shareBtn" data-focusable>Copy view-only link</button>
-    <button class="add-booking-btn" id="addBookingBtn" data-focusable>+ Add booking</button>
+    ${showAdd ? '<button class="add-booking-btn" id="addBookingBtn" data-focusable>+ Add booking</button>' : ''}
   `;
-  document.getElementById('addBookingBtn').addEventListener('click', () => openBookingModal(null));
+  if(showAdd) document.getElementById('addBookingBtn').addEventListener('click', () => openBookingModal(null));
   document.getElementById('shareBtn').addEventListener('click', copyViewLink);
   document.getElementById('editKeyBtn').addEventListener('click', () => openEditKeyModal());
 }
@@ -462,9 +473,16 @@ function followupIndicatorHtml(card){
 }
 
 function render(){
+  renderHeaderActions();
   renderTabs();
   renderNoteBar();
   renderBoard();
+  if(activeCategoryId === 'ALL'){
+    const todayISO = todayLocalISO();
+    const count = state.cards.filter(c => c.eventDate && c.eventDate >= todayISO && c.status !== 'cancelled' && c.status !== 'archive').length;
+    document.getElementById('subtitle').textContent = `All Bookings · ${count} upcoming${isViewer ? ' · read only' : ''}`;
+    return;
+  }
   const cat = state.categories.find(c => c.id === activeCategoryId);
   const count = state.cards.filter(c => c.categoryId === activeCategoryId).length;
   document.getElementById('subtitle').textContent =
@@ -474,6 +492,13 @@ function render(){
 function renderTabs(){
   const tabs = document.getElementById('tabs');
   tabs.innerHTML = '';
+
+  const allTab = document.createElement('button');
+  allTab.className = 'tab' + (activeCategoryId === 'ALL' ? ' active' : '');
+  allTab.innerHTML = `🗓️ All Bookings`;
+  allTab.addEventListener('click', () => { activeCategoryId = 'ALL'; render(); });
+  tabs.appendChild(allTab);
+
   state.categories.forEach(cat => {
     const count = state.cards.filter(c => c.categoryId === cat.id).length;
     const el = document.createElement('button');
@@ -520,6 +545,7 @@ function deleteCategory(catId){
 
 function renderNoteBar(){
   const bar = document.getElementById('noteBar');
+  if(activeCategoryId === 'ALL'){ bar.className = 'note-bar'; bar.innerHTML = ''; return; }
   const cat = state.categories.find(c => c.id === activeCategoryId);
   if(!cat){ bar.className = 'note-bar'; bar.innerHTML = ''; return; }
   if(cat.note && cat.note.trim()){
@@ -572,8 +598,51 @@ function openEditNoteModal(cat){
   };
 }
 
+function renderAllBookingsView(){
+  const board = document.getElementById('board');
+  const todayISO = todayLocalISO();
+  const upcoming = state.cards
+    .filter(c => c.eventDate && c.eventDate >= todayISO && c.status !== 'cancelled' && c.status !== 'archive')
+    .sort((a, b) => (a.eventDate > b.eventDate ? 1 : a.eventDate < b.eventDate ? -1 : 0));
+
+  if(upcoming.length === 0){
+    board.innerHTML = `<div class="empty-col" style="width:100%; max-width:400px;">No upcoming bookings yet</div>`;
+    return;
+  }
+
+  const rows = upcoming.map(c => {
+    const cat = state.categories.find(cc => cc.id === c.categoryId) || { name:'', color:'pink' };
+    const statusObj = STATUSES.find(s => s.id === c.status);
+    const timeRange = [c.eventTime, c.eventEndTime].filter(Boolean).join(' – ');
+    const metaLine = [cat.name, formatDate(c.eventDate), timeRange].filter(Boolean).join(' · ');
+    return `
+      <div class="all-booking-row" data-id="${c.id}" style="border-left-color:${cardColor(c, cat)}">
+        <div class="all-booking-main">
+          <div class="card-client">${escapeHtml(c.client)}</div>
+          <div class="card-line">${escapeHtml(metaLine)}</div>
+          ${c.location ? `<div class="card-line">${escapeHtml(c.location)}</div>` : ''}
+        </div>
+        <span class="card-tag">${escapeHtml(statusObj ? statusObj.label : c.status)}</span>
+      </div>
+    `;
+  }).join('');
+
+  board.innerHTML = `<div class="all-bookings-list">${rows}</div>`;
+
+  board.querySelectorAll('.all-booking-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const card = state.cards.find(c => c.id === row.dataset.id);
+      if(card) openBookingModal(card);
+    });
+  });
+}
+
 function renderBoard(){
   const board = document.getElementById('board');
+  if(activeCategoryId === 'ALL'){
+    renderAllBookingsView();
+    return;
+  }
   board.innerHTML = '';
   const cat = state.categories.find(c => c.id === activeCategoryId);
   if(!cat) return;
@@ -602,7 +671,7 @@ function renderBoard(){
     }
     cardsHere.forEach(card => list.appendChild(renderCard(card, cat)));
 
-    if((status.id === 'confirmed' || status.id === 'completed') && cardsHere.length > 0){
+    if(status.id === 'completed' && cardsHere.length > 0){
       const total = cardsHere.reduce((sum, c) => sum + parsePrice(c.price) + extraTotal(c), 0);
       const footer = document.createElement('div');
       footer.className = 'column-footer';
@@ -1042,10 +1111,9 @@ function checkSessionsToday(){
 }
 
 async function init(){
-  renderHeaderActions();
   renderViewerBanner();
   await loadState();
-  activeCategoryId = state.categories[0].id;
+  activeCategoryId = 'ALL';
   render();
   checkSessionsToday();
   if(!isViewer && !getEditKey()){
