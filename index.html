@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -479,8 +480,8 @@ function render(){
   renderBoard();
   if(activeCategoryId === 'ALL'){
     const todayISO = todayLocalISO();
-    const count = state.cards.filter(c => c.eventDate && c.eventDate >= todayISO && c.status !== 'cancelled' && c.status !== 'archive').length;
-    document.getElementById('subtitle').textContent = `All Bookings · ${count} upcoming${isViewer ? ' · read only' : ''}`;
+    const count = state.cards.filter(c => c.eventDate && c.eventDate >= todayISO && c.status === 'confirmed').length;
+    document.getElementById('subtitle').textContent = `All Confirmed Bookings · ${count} confirmed${isViewer ? ' · read only' : ''}`;
     return;
   }
   const cat = state.categories.find(c => c.id === activeCategoryId);
@@ -495,7 +496,7 @@ function renderTabs(){
 
   const allTab = document.createElement('button');
   allTab.className = 'tab' + (activeCategoryId === 'ALL' ? ' active' : '');
-  allTab.innerHTML = `🗓️ All Bookings`;
+  allTab.innerHTML = `All Confirmed Bookings`;
   allTab.addEventListener('click', () => { activeCategoryId = 'ALL'; render(); });
   tabs.appendChild(allTab);
 
@@ -602,11 +603,11 @@ function renderAllBookingsView(){
   const board = document.getElementById('board');
   const todayISO = todayLocalISO();
   const upcoming = state.cards
-    .filter(c => c.eventDate && c.eventDate >= todayISO && c.status !== 'cancelled' && c.status !== 'archive')
+    .filter(c => c.eventDate && c.eventDate >= todayISO && c.status === 'confirmed')
     .sort((a, b) => (a.eventDate > b.eventDate ? 1 : a.eventDate < b.eventDate ? -1 : 0));
 
   if(upcoming.length === 0){
-    board.innerHTML = `<div class="empty-col" style="width:100%; max-width:400px;">No upcoming bookings yet</div>`;
+    board.innerHTML = `<div class="empty-col" style="width:100%; max-width:400px;">No confirmed bookings yet</div>`;
     return;
   }
 
@@ -1125,3 +1126,6 @@ init();
 </script>
 </body>
 </html>
+```
+
+Done — the tab now reads plain "All Confirmed Bookings" (no emoji), and only shows bookings currently sitting in the Confirmed column across every category.
