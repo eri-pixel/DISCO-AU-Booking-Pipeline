@@ -148,6 +148,11 @@
   }
   .all-booking-row:hover{ border-color: var(--sky); }
   .all-booking-main{ flex:1; min-width:0; }
+  .month-header{
+    font-family:'Poppins',sans-serif; font-weight:800; font-size:12px; letter-spacing:1.4px;
+    color:var(--pink); margin:10px 0 -2px; padding-left:2px;
+  }
+  .month-header:first-child{ margin-top:0; }
   .column{
     background: var(--panel); border:1.5px solid var(--border); border-radius:14px;
     width: 246px; min-width:246px; display:flex; flex-direction:column; max-height:100%;
@@ -650,6 +655,11 @@ function openEditNoteModal(cat){
   };
 }
 
+function monthLabel(iso){
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('en-AU', { month:'long', year:'numeric' }).toUpperCase();
+}
+
 function renderAllBookingsView(){
   const board = document.getElementById('board');
   const todayISO = todayLocalISO();
@@ -662,12 +672,19 @@ function renderAllBookingsView(){
     return;
   }
 
-  const rows = upcoming.map(c => {
+  let html = '';
+  let lastMonth = null;
+  upcoming.forEach(c => {
+    const monthKey = c.eventDate.slice(0, 7);
+    if(monthKey !== lastMonth){
+      html += `<div class="month-header">${monthLabel(c.eventDate)}</div>`;
+      lastMonth = monthKey;
+    }
     const cat = state.categories.find(cc => cc.id === c.categoryId) || { name:'', color:'pink' };
     const statusObj = STATUSES.find(s => s.id === c.status);
     const timeRange = [c.eventTime, c.eventEndTime].filter(Boolean).join(' – ');
     const metaLine = [cat.name, formatDate(c.eventDate), timeRange].filter(Boolean).join(' · ');
-    return `
+    html += `
       <div class="all-booking-row" data-id="${c.id}" style="border-left-color:${cardColor(c, cat)}">
         <div class="all-booking-main">
           <div class="card-client">${escapeHtml(c.client)}</div>
@@ -677,9 +694,9 @@ function renderAllBookingsView(){
         <span class="card-tag">${escapeHtml(statusObj ? statusObj.label : c.status)}</span>
       </div>
     `;
-  }).join('');
+  });
 
-  board.innerHTML = `<div class="all-bookings-list">${rows}</div>`;
+  board.innerHTML = `<div class="all-bookings-list">${html}</div>`;
 
   board.querySelectorAll('.all-booking-row').forEach(row => {
     row.addEventListener('click', () => {
