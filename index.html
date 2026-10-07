@@ -28,6 +28,16 @@
     --amber-bg: #FFF3D6;
     --amber-tx: #9A6B00;
     --amber-bd: #FCE4A6;
+    --teal-bg: #E3F8F5;
+    --teal-bd: #B8EBE4;
+    --indigo-bg: #ECE9FF;
+    --indigo-bd: #CFC9FA;
+    --kids-bg: #FFF4D6;
+    --kids-bd: #FCE4A6;
+    --hens-bg: #FFE6F3;
+    --hens-bd: #FFC2E0;
+    --other-bg: #E1F3FB;
+    --other-bd: #B5E0F3;
   }
   * { box-sizing: border-box; }
   html, body { margin:0; padding:0; }
@@ -73,6 +83,7 @@
   .btn-share:hover{ border-color: var(--sky); }
   [data-focusable]:focus-visible{ outline:2px solid var(--sky); outline-offset:2px; }
 
+  .viewer-banner.warn{ background:#FFE9ED; color:#B3213F; border-bottom-color:#FFC2CD; font-weight:700; line-height:1.5; }
   .viewer-banner{
     background: var(--amber-bg); color: var(--amber-tx); font-size:12px; font-weight:600; text-align:center;
     padding:7px; border-bottom:1px solid var(--amber-bd); flex-shrink:0;
@@ -140,23 +151,74 @@
   .note-edit:hover, .note-edit-link:hover{ background:var(--pink); color:#fff; }
 
   .board{ display:flex; gap:14px; align-items:flex-start; }
-  .all-bookings-list{ display:flex; flex-direction:column; gap:8px; width:100%; max-width:640px; }
+  .upcoming-single{ width:100%; max-width:820px; }
+  .row-notes{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .filter-bar{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; }
+  .filter-chip{
+    display:inline-flex; align-items:center; gap:7px; cursor:pointer;
+    font-family:'Poppins',sans-serif; font-weight:700; font-size:12.5px;
+    background: var(--panel); color: var(--muted); border:1.5px solid var(--border);
+    padding:7px 13px; border-radius:20px;
+  }
+  .filter-chip:hover{ border-color: var(--pink); color: var(--text); }
+  .filter-chip .fc-count{ background: var(--panel-2); color: var(--muted); border-radius:20px; padding:0 7px; font-size:11px; }
+  .filter-chip .fc-dot{ width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .filter-chip.type-kids .fc-dot{ background: var(--amber); }
+  .filter-chip.type-hens .fc-dot{ background: var(--pink); }
+  .filter-chip.type-other .fc-dot{ background: var(--sky); }
+  .filter-chip.active{ background: var(--text); border-color: var(--text); color:#fff; }
+  .filter-chip.active .fc-count{ background: rgba(255,255,255,0.22); color:#fff; }
+  .filter-chip.active.type-kids{ background: var(--amber); border-color: var(--amber); color:#5A4300; }
+  .filter-chip.active.type-kids .fc-count{ background: rgba(90,67,0,0.15); color:#5A4300; }
+  .filter-chip.active.type-kids .fc-dot{ background:#5A4300; }
+  .filter-chip.active.type-hens{ background: var(--pink); border-color: var(--pink); color:#fff; }
+  .filter-chip.active.type-other{ background: var(--sky); border-color: var(--sky); color:#fff; }
+  .filter-chip.active .fc-dot{ box-shadow: 0 0 0 2px rgba(255,255,255,0.7); }
+  .section-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:14px; }
+  .section-title{ font-weight:800; font-size:16px; }
+  .section-sub{ color:var(--muted); font-size:11.5px; font-weight:500; margin-top:1px; }
+  .section-count{
+    font-weight:700; font-size:12px; padding:2px 11px; border-radius:20px;
+    background: var(--green-bg); color: var(--green);
+  }
+  .upcoming-section.pencilled .section-count{ background: var(--indigo-bg); color: var(--indigo); }
+  .month-block{
+    background: var(--panel); border:1.5px solid var(--border); border-radius:16px;
+    overflow:hidden; margin-bottom:20px; box-shadow:0 2px 8px rgba(46,36,56,0.05);
+  }
+  .month-head{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:12px 16px; background: var(--green-bg); border-bottom:2px solid var(--green-bd);
+  }
+  .upcoming-section.pencilled .month-head{ background: var(--indigo-bg); border-bottom-color: var(--indigo-bd); }
+  .month-name{ font-weight:800; font-size:14px; letter-spacing:1.6px; color: var(--text); }
+  .month-year{ font-weight:600; color: var(--muted); letter-spacing:1px; }
+  .month-count{
+    font-weight:700; font-size:11.5px; color: var(--muted); background:#fff;
+    border:1px solid var(--border); padding:2px 10px; border-radius:20px; letter-spacing:0;
+  }
+  .month-rows{ padding:12px; display:flex; flex-direction:column; gap:8px; }
   .all-booking-row{
     display:flex; align-items:center; justify-content:space-between; gap:12px;
     background: var(--panel-2); border:1.5px solid var(--border); border-left-width:5px; border-radius:12px;
-    padding:11px 14px; cursor:pointer; transition: border-color .12s ease;
+    padding:10px 14px 10px 10px; cursor:pointer; transition: border-color .12s ease;
   }
   .all-booking-row:hover{ border-color: var(--sky); }
   .all-booking-main{ flex:1; min-width:0; }
-  .month-header{
-    display:flex; align-items:baseline; justify-content:space-between;
-    font-family:'Poppins',sans-serif; font-weight:800; font-size:12px; letter-spacing:1.4px;
-    color:var(--pink); margin:10px 0 -2px; padding-left:2px;
+  .row-date{
+    flex-shrink:0; width:48px; text-align:center; background:#fff;
+    border:1.5px solid var(--border); border-radius:10px; padding:5px 0;
   }
-  .month-header:first-child{ margin-top:0; }
-  .month-count{
-    font-weight:600; font-size:11px; letter-spacing:0; color:var(--muted); text-transform:none;
-  }
+  .rd-day{ font-weight:800; font-size:17px; line-height:1.1; color: var(--text); }
+  .rd-dow{ font-size:9.5px; font-weight:700; color: var(--muted); letter-spacing:0.8px; }
+  .all-booking-row.type-kids{ border-left-color: var(--amber); }
+  .all-booking-row.type-hens{ border-left-color: var(--pink); }
+  .all-booking-row.type-other{ border-left-color: var(--sky); }
+  .all-booking-row.type-kids .row-date{ background: var(--kids-bg); border-color: var(--kids-bd); }
+  .all-booking-row.type-hens .row-date{ background: var(--hens-bg); border-color: var(--hens-bd); }
+  .all-booking-row.type-other .row-date{ background: var(--other-bg); border-color: var(--other-bd); }
+  .all-booking-row .row-date.tbc .rd-day{ font-size:13px; }
+  .all-booking-row .row-date.tbc{ border-style:dashed; }
   .column{
     background: var(--panel); border:1.5px solid var(--border); border-radius:14px;
     width: 246px; min-width:246px; display:flex; flex-direction:column; max-height:100%;
@@ -187,7 +249,7 @@
   .card-tag.tag-paid{ background: var(--green-bg); color:var(--green); border-color:var(--green-bd); }
   .card-tag.tag-sent{ background: var(--amber-bg); color:var(--amber-tx); border-color:var(--amber-bd); }
   .card-overdue-flag{ color: var(--red); font-size:10.5px; font-weight:700; margin-top:6px; display:flex; align-items:center; gap:4px; }
-  .followup-countdown{ color: var(--sky); font-size:10.5px; font-weight:700; margin-top:6px; display:flex; align-items:center; gap:4px; }
+  .followup-countdown{ color: var(--indigo); font-size:10.5px; font-weight:700; margin-top:6px; display:flex; align-items:center; gap:4px; }
   .card-del{
     position:absolute; top:8px; right:8px; background:none; border:none;
     color: var(--muted-2); font-size:13px; cursor:pointer; line-height:1; padding:4px;
@@ -265,6 +327,7 @@
 
   <main>
     <div class="note-bar" id="noteBar"></div>
+    <div class="filter-bar" id="filterBar"></div>
     <div class="board" id="board"></div>
   </main>
 </div>
@@ -309,25 +372,15 @@ const params = new URLSearchParams(window.location.search);
 const isViewer = params.get('view') === '1';
 
 function defaultState(){
-  return {
-    categories: [
-      { id: uid(), name:'Kids Party', color:'pink',
-        note:'Kids Party 1.5hrs up to 25 Kids\nPackage Price: $575 plus GST\nExtra Child: $8 plus GST\nDon\'t forget about the T&Cs :)' },
-      { id: uid(), name:'Hens Party', color:'coral',
-        note:'Hens Party 1.5hrs up to 11-15 Guests\nPackage Price: $640 plus GST\nExtra Guest: $35 plus GST\nDon\'t forget about the T&Cs :)' },
-      { id: uid(), name:'School Holidays', color:'teal',
-        note:'School Holidays 1.5hrs up to 40 Children\nStandard Package Price: $475 plus GST\nExtra Child: $8 plus GST\nPrices may vary for PVT SH bookings\nDon\'t forget about the T&Cs :)' },
-    ],
-    cards: [],
-    allNote: ''
-  };
+  return { categories: [], cards: [], allNote: '', pendingNote: '', importedBatches: [], dismissedKeys: [] };
 }
 
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
 
 let state = null;
-let activeCategoryId = null;
-let draggedCardId = null;
+let activeTab = 'CONFIRMED';
+let activeFilter = 'ALL';
+let loadFailed = false;
 
 /* ---------------- Storage (Google Sheet via Apps Script) ---------------- */
 
@@ -338,22 +391,42 @@ async function loadState(){
   try{
     const res = await fetch(CONFIG.API_URL);
     const data = await res.json();
-    state = (data && data.categories && data.categories.length) ? data : defaultState();
+    if(data && Array.isArray(data.cards)){
+      state = data;
+    } else if(data && Object.keys(data).length === 0){
+      state = defaultState();
+    } else {
+      state = defaultState();
+      loadFailed = true;
+      showToast('Could not read your data from the sheet — saving is paused');
+    }
   }catch(e){
     state = defaultState();
-    showToast('Could not load from the sheet — showing defaults');
+    loadFailed = true;
+    showToast('Could not load from the sheet — saving is paused');
   }
+  if(!state.categories) state.categories = [];
   if(!state.cards) state.cards = [];
   if(state.allNote === undefined) state.allNote = '';
+  if(state.pendingNote === undefined) state.pendingNote = '';
+  if(!state.importedBatches) state.importedBatches = [];
+  if(!state.dismissedKeys) state.dismissedKeys = [];
 }
 
 let saveTimeout = null;
-function saveState(){
+const LOAD_FAILED_MSG = "Couldn't load your saved bookings, so saving is paused to protect them. Refresh the page. If it keeps happening, in Apps Script check Deploy > Manage deployments > \"Who has access\" is set to Anyone.";
+function saveState(onDone){
   if(isViewer) return;
+  if(loadFailed){
+    setBanner(LOAD_FAILED_MSG);
+    showToast('Not saved — the board could not load your data');
+    if(onDone) onDone(false);
+    return;
+  }
   clearTimeout(saveTimeout);
   saveTimeout = setTimeout(async () => {
     const key = getEditKey();
-    if(!key){ openEditKeyModal(() => saveState()); return; }
+    if(!key){ openEditKeyModal(() => saveState(onDone)); return; }
     try{
       const body = new URLSearchParams();
       body.set('key', key);
@@ -361,15 +434,20 @@ function saveState(){
       const res = await fetch(CONFIG.API_URL, { method: 'POST', body });
       const result = await res.json();
       if(!result.ok){
-        showToast('Save failed — check your edit key');
+        setBanner('Your last change did NOT save — your edit key was not accepted. Tap 🔑 Edit key and re-enter it.');
+        if(onDone) onDone(false);
+      } else {
+        setBanner('');
+        if(onDone) onDone(true);
       }
     }catch(e){
-      showToast('Could not save — check your connection');
+      setBanner('Your last change did NOT save — could not reach the sheet. Check your internet, then try again.');
+      if(onDone) onDone(false);
     }
   }, 500);
 }
 
-function openEditKeyModal(onSaved){
+function openEditKeyModal(onSaved, onSkip){
   const root = document.getElementById('modalRoot');
   root.innerHTML = `
     <div class="overlay" id="overlay">
@@ -390,10 +468,10 @@ function openEditKeyModal(onSaved){
     closeModal();
     if(onSaved) onSaved();
   };
-  document.getElementById('overlay').addEventListener('click', (e) => { if(e.target.id === 'overlay') closeModal(); });
+  document.getElementById('overlay').addEventListener('click', (e) => {
+    if(e.target.id === 'overlay'){ closeModal(); if(onSkip) onSkip(); }
+  });
 }
-
-/* ---------------- Everything below is unchanged from the Claude version ---------------- */
 
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -438,15 +516,21 @@ function noteDisplay(note){
 function renderHeaderActions(){
   const el = document.getElementById('headerActions');
   if(isViewer){ el.innerHTML = ''; return; }
-  const showAdd = activeCategoryId !== 'ALL';
+  const missing = missingImports().length;
+  const showImport = missing > 0 || fixesPending();
+  const importLabel = missing === IMPORT_BOOKINGS.length ? '⬇ Add bookings list'
+    : (missing > 0 ? `⬇ Re-add ${missing} missing booking${missing === 1 ? '' : 's'}` : '⬇ Apply list updates');
   el.innerHTML = `
     <button class="btn-share" id="editKeyBtn" data-focusable>🔑 Edit key</button>
     <button class="btn-share" id="shareBtn" data-focusable>Copy view-only link</button>
-    ${showAdd ? '<button class="add-booking-btn" id="addBookingBtn" data-focusable>+ Add booking</button>' : ''}
+    ${showImport ? `<button class="btn-share" id="importBtn" data-focusable>${importLabel}</button>` : ''}
+    <button class="add-booking-btn" id="addBookingBtn" data-focusable>+ Add booking</button>
   `;
-  if(showAdd) document.getElementById('addBookingBtn').addEventListener('click', () => openBookingModal(null));
+  document.getElementById('addBookingBtn').addEventListener('click', () => openBookingModal(null));
   document.getElementById('shareBtn').addEventListener('click', copyViewLink);
   document.getElementById('editKeyBtn').addEventListener('click', () => openEditKeyModal());
+  const importBtn = document.getElementById('importBtn');
+  if(importBtn) importBtn.addEventListener('click', importConfirmedList);
 }
 
 function copyViewLink(){
@@ -460,10 +544,12 @@ function copyViewLink(){
   }
 }
 
-function renderViewerBanner(){
+function setBanner(msg){
   const el = document.getElementById('viewerBanner');
-  el.innerHTML = '';
+  el.innerHTML = msg ? `<div class="viewer-banner warn">⚠ ${escapeHtml(msg)}</div>` : '';
 }
+
+function renderViewerBanner(){ setBanner(''); }
 
 function isOverdue(card){
   if(!FOLLOWUP_STATUSES.includes(card.status)) return false;
@@ -487,133 +573,74 @@ function render(){
   renderHeaderActions();
   renderTabs();
   renderNoteBar();
+  renderFilterBar();
   renderBoard();
-  if(activeCategoryId === 'ALL'){
-    const todayISO = todayLocalISO();
-    const count = state.cards.filter(c => c.eventDate && c.eventDate >= todayISO && (c.status === 'confirmed' || c.status === 'staffed')).length;
-    document.getElementById('subtitle').textContent = `All Confirmed Bookings · ${count} confirmed${isViewer ? ' · read only' : ''}`;
-    return;
-  }
-  const cat = state.categories.find(c => c.id === activeCategoryId);
-  const count = state.cards.filter(c => c.categoryId === activeCategoryId).length;
-  document.getElementById('subtitle').textContent =
-    `${cat ? cat.name : ''} · ${count} booking${count === 1 ? '' : 's'}${isViewer ? ' · read only' : ''}`;
+  const ro = isViewer ? ' · read only' : '';
+  const shown = applyFilter(currentBaseItems()).length;
+  const f = FILTERS.find(x => x.id === activeFilter);
+  const filt = activeFilter === 'ALL' ? '' : ` · ${f.label}`;
+  document.getElementById('subtitle').textContent = activeTab === 'CONFIRMED'
+    ? `Upcoming Bookings · ${shown} confirmed${filt}${ro}`
+    : `Tentative Bookings · ${shown} waiting on a yes${filt}${ro}`;
 }
 
 function renderTabs(){
   const tabs = document.getElementById('tabs');
   tabs.innerHTML = '';
-
-  const allTab = document.createElement('button');
-  allTab.className = 'tab' + (activeCategoryId === 'ALL' ? ' active' : '');
-  allTab.innerHTML = `All Confirmed Bookings`;
-  allTab.addEventListener('click', () => { activeCategoryId = 'ALL'; render(); });
-  tabs.appendChild(allTab);
-
-  state.categories.forEach(cat => {
-    const count = state.cards.filter(c => c.categoryId === cat.id).length;
+  [
+    { id:'CONFIRMED', label:'Upcoming Bookings',      count:getConfirmedUpcoming().length },
+    { id:'PENDING',   label:'Tentative Bookings',     count:getPencilledIn().length },
+  ].forEach(t => {
     const el = document.createElement('button');
-    el.className = 'tab' + (cat.id === activeCategoryId ? ' active' : '');
-    el.innerHTML = `<span class="dot" style="background:${COLOR_HEX[cat.color]}"></span>
-      ${escapeHtml(cat.name)} <span class="tab-count">${count}</span>
-      ${!isViewer ? '<span class="tab-del" title="Delete category">✕</span>' : ''}`;
-    el.addEventListener('click', () => { activeCategoryId = cat.id; render(); });
-    if(!isViewer){
-      const delEl = el.querySelector('.tab-del');
-      delEl.addEventListener('click', (e) => { e.stopPropagation(); deleteCategory(cat.id); });
-    }
+    el.className = 'tab' + (activeTab === t.id ? ' active' : '');
+    el.innerHTML = `${t.label} <span class="tab-count">${t.count}</span>`;
+    el.addEventListener('click', () => { activeTab = t.id; render(); });
     tabs.appendChild(el);
   });
-  if(!isViewer){
-    const addBtn = document.createElement('button');
-    addBtn.className = 'add-tab';
-    addBtn.textContent = '+';
-    addBtn.title = 'Add category';
-    addBtn.onclick = openAddCategoryModal;
-    tabs.appendChild(addBtn);
-  }
 }
 
-function deleteCategory(catId){
-  if(state.categories.length <= 1){
-    showToast("You need at least one category — can't delete the last one");
-    return;
-  }
-  const cat = state.categories.find(c => c.id === catId);
-  if(!cat) return;
-  const count = state.cards.filter(c => c.categoryId === catId).length;
-  const msg = count > 0
-    ? `Delete "${cat.name}"? This will also permanently delete ${count} booking${count === 1 ? '' : 's'} in it.`
-    : `Delete "${cat.name}"?`;
-  openConfirmModal(msg, () => {
-    state.categories = state.categories.filter(c => c.id !== catId);
-    state.cards = state.cards.filter(c => c.categoryId !== catId);
-    if(activeCategoryId === catId){ activeCategoryId = state.categories[0].id; }
-    saveState();
-    render();
-  });
-}
+function currentNoteKey(){ return activeTab === 'CONFIRMED' ? 'allNote' : 'pendingNote'; }
 
 function renderNoteBar(){
   const bar = document.getElementById('noteBar');
-  if(activeCategoryId === 'ALL'){
-    if(state.allNote && state.allNote.trim()){
-      bar.className = 'note-bar';
-      bar.innerHTML = `
-        <span class="pin">📌</span>
-        <span class="note-text">${escapeHtml(noteDisplay(state.allNote))}</span>
-        ${!isViewer ? '<button class="note-edit" id="editNoteBtn">✎ Edit</button>' : ''}
-      `;
-    } else if(!isViewer){
-      bar.className = 'note-bar empty';
-      bar.innerHTML = `
-        <span class="pin">📌</span>
-        <span class="note-text">No note yet</span>
-        <button class="note-edit-link" id="editNoteBtn">+ Add note</button>
-      `;
-    } else {
-      bar.className = 'note-bar'; bar.innerHTML = '';
-    }
-    if(!isViewer){
-      const btn = document.getElementById('editNoteBtn');
-      if(btn) btn.onclick = () => openEditAllNoteModal();
-    }
-    return;
-  }
-  const cat = state.categories.find(c => c.id === activeCategoryId);
-  if(!cat){ bar.className = 'note-bar'; bar.innerHTML = ''; return; }
-  if(cat.note && cat.note.trim()){
+  const note = state[currentNoteKey()];
+  bar.style.display = '';
+  if(note && note.trim()){
     bar.className = 'note-bar';
     bar.innerHTML = `
       <span class="pin">📌</span>
-      <span class="note-text">${escapeHtml(noteDisplay(cat.note))}</span>
+      <span class="note-text">${escapeHtml(noteDisplay(note))}</span>
       ${!isViewer ? '<button class="note-edit" id="editNoteBtn">✎ Edit</button>' : ''}
     `;
   } else if(!isViewer){
     bar.className = 'note-bar empty';
     bar.innerHTML = `
       <span class="pin">📌</span>
-      <span class="note-text">No package note yet</span>
+      <span class="note-text">No note yet</span>
       <button class="note-edit-link" id="editNoteBtn">+ Add note</button>
     `;
   } else {
-    bar.className = 'note-bar'; bar.innerHTML = '';
+    bar.className = 'note-bar';
+    bar.innerHTML = '';
+    bar.style.display = 'none';
   }
   if(!isViewer){
     const btn = document.getElementById('editNoteBtn');
-    if(btn) btn.onclick = () => openEditNoteModal(cat);
+    if(btn) btn.onclick = () => openEditNoteModal();
   }
 }
 
-function openEditAllNoteModal(){
+function openEditNoteModal(){
+  const key = currentNoteKey();
+  const title = activeTab === 'CONFIRMED' ? 'Upcoming Bookings' : 'Tentative Bookings';
   const root = document.getElementById('modalRoot');
   root.innerHTML = `
     <div class="overlay" id="overlay">
       <div class="modal">
-        <h2>📌 Note — All Confirmed Bookings</h2>
+        <h2>📌 Note — ${title}</h2>
         <div class="field">
           <label for="f-note">One line per point — shown joined with dots in a compact bar</label>
-          <textarea id="f-note" class="note-textarea" placeholder="e.g. a reminder relevant to confirmed bookings...">${escapeHtml(state.allNote || '')}</textarea>
+          <textarea id="f-note" class="note-textarea" placeholder="e.g. a reminder for this list...">${escapeHtml(state[key] || '')}</textarea>
         </div>
         <div class="modal-actions"><div></div><div class="modal-actions-right">
           <button class="btn-ghost" id="cancelBtn">Cancel</button>
@@ -625,34 +652,7 @@ function openEditAllNoteModal(){
   document.getElementById('cancelBtn').onclick = closeModal;
   document.getElementById('overlay').addEventListener('click', (e) => { if(e.target.id === 'overlay') closeModal(); });
   document.getElementById('saveNoteBtn').onclick = () => {
-    state.allNote = document.getElementById('f-note').value.trim();
-    saveState();
-    closeModal();
-    renderNoteBar();
-  };
-}
-
-function openEditNoteModal(cat){
-  const root = document.getElementById('modalRoot');
-  root.innerHTML = `
-    <div class="overlay" id="overlay">
-      <div class="modal">
-        <h2>📌 Package note — ${escapeHtml(cat.name)}</h2>
-        <div class="field">
-          <label for="f-note">One line per point — shown joined with dots in a compact bar</label>
-          <textarea id="f-note" class="note-textarea" placeholder="e.g. package price, inclusions, T&amp;Cs reminder...">${escapeHtml(cat.note || '')}</textarea>
-        </div>
-        <div class="modal-actions"><div></div><div class="modal-actions-right">
-          <button class="btn-ghost" id="cancelBtn">Cancel</button>
-          <button class="btn-primary" id="saveNoteBtn">Save note</button>
-        </div></div>
-      </div>
-    </div>
-  `;
-  document.getElementById('cancelBtn').onclick = closeModal;
-  document.getElementById('overlay').addEventListener('click', (e) => { if(e.target.id === 'overlay') closeModal(); });
-  document.getElementById('saveNoteBtn').onclick = () => {
-    cat.note = document.getElementById('f-note').value.trim();
+    state[key] = document.getElementById('f-note').value.trim();
     saveState();
     closeModal();
     renderNoteBar();
@@ -664,52 +664,473 @@ function monthLabel(iso){
   return d.toLocaleDateString('en-AU', { month:'long', year:'numeric' }).toUpperCase();
 }
 
-function renderAllBookingsView(){
-  const board = document.getElementById('board');
+
+const IMPORT_BATCH_ID = 'confirmed-list-2026-10-07-v2';
+const IMPORT_BOOKINGS = [
+ {
+  "d": "2026-10-07",
+  "m": "",
+  "e": "Time Travellers",
+  "c": "City of Parramatta (Rebecca R)",
+  "n": "",
+  "s": "",
+  "k": "L01"
+ },
+ {
+  "d": "2026-10-08",
+  "m": "",
+  "e": "Silent Disco",
+  "c": "Cessnock Libraries (Amy C)",
+  "n": "",
+  "s": "",
+  "k": "L02"
+ },
+ {
+  "d": "2026-10-08",
+  "m": "",
+  "e": "Neon Garden Activation",
+  "c": "City of Ryde (Katie Brown)",
+  "n": "",
+  "s": "",
+  "k": "L03"
+ },
+ {
+  "d": "2026-10-09",
+  "m": "",
+  "e": "Neon Garden Activation",
+  "c": "City of Ryde (Katie Brown)",
+  "n": "",
+  "s": "",
+  "k": "L04"
+ },
+ {
+  "d": "2026-10-10",
+  "m": "",
+  "e": "LED Hula Hoop",
+  "c": "Private Party - LED Hula Hoop - FI",
+  "n": "",
+  "s": "",
+  "k": "L05"
+ },
+ {
+  "d": "2026-10-12",
+  "m": "",
+  "e": "Silent Disco",
+  "c": "Balgownie Public School (Wildcare)",
+  "n": "",
+  "s": "",
+  "k": "L06"
+ },
+ {
+  "d": "2026-10-15",
+  "m": "",
+  "e": "Silent Disco Activation",
+  "c": "STRYDE4 (Em Hardwicke)",
+  "n": "",
+  "s": "",
+  "k": "L07"
+ },
+ {
+  "d": "2026-10-22",
+  "m": "",
+  "e": "Silent Disco Activation",
+  "c": "STRYDE4 (Em Hardwicke)",
+  "n": "",
+  "s": "",
+  "k": "L08"
+ },
+ {
+  "d": "2026-10-29",
+  "m": "",
+  "e": "Silent Disco",
+  "c": "Bunnings Gladesville - FI",
+  "n": "",
+  "s": "",
+  "k": "L09"
+ },
+ {
+  "d": "2026-11-05",
+  "m": "",
+  "e": "Silent Mindful Mandalas",
+  "c": "Amanda Holman",
+  "n": "",
+  "s": "",
+  "k": "L10"
+ },
+ {
+  "d": "2026-11-06",
+  "m": "",
+  "e": "Ryde River Walks",
+  "c": "City of Ryde (Katie Brown)",
+  "n": "5 Monthly 1st Fridays Dates",
+  "s": "",
+  "k": "L11"
+ },
+ {
+  "d": "2026-11-14",
+  "m": "",
+  "e": "Kids Party Silent Disco Walk",
+  "c": "John Musca",
+  "n": "",
+  "s": "",
+  "k": "L12"
+ },
+ {
+  "d": "2026-11-19",
+  "m": "",
+  "e": "Silent Disco",
+  "c": "Mittagong Primary School",
+  "n": "",
+  "s": "",
+  "k": "L13"
+ },
+ {
+  "d": "2026-11-21",
+  "m": "",
+  "e": "Kids Party",
+  "c": "Allegra's Kids Party",
+  "n": "",
+  "s": "",
+  "k": "L14"
+ },
+ {
+  "d": "2026-11-21",
+  "m": "",
+  "e": "Hens Party",
+  "c": "Erin's Hens Party (Katrina)",
+  "n": "",
+  "s": "",
+  "k": "L15"
+ },
+ {
+  "d": "2026-11-21",
+  "m": "",
+  "e": "Disability Disco",
+  "c": "David",
+  "n": "Series: Nov 21 & May/Aug/Nov 2027",
+  "s": "",
+  "k": "L16"
+ },
+ {
+  "d": "2026-11-25",
+  "m": "",
+  "e": "Graduation Party",
+  "c": "Carabella Preschool (Christine)",
+  "n": "",
+  "s": "",
+  "k": "L17"
+ },
+ {
+  "d": "",
+  "m": "2026-12",
+  "e": "School Holidays / School Disco",
+  "c": "Tracey Lowrey (Dungog Shire)",
+  "n": "",
+  "s": "",
+  "k": "L18"
+ },
+ {
+  "d": "2026-12-04",
+  "m": "",
+  "e": "Ryde River Walks",
+  "c": "City of Ryde (Katie Brown)",
+  "n": "",
+  "s": "",
+  "k": "L19"
+ },
+ {
+  "d": "2026-12-31",
+  "m": "",
+  "e": "New Year's Eve Event Activation",
+  "c": "Angela & Kelly – Liverpool City Council",
+  "n": "",
+  "s": "enquiry",
+  "k": "L20"
+ },
+ {
+  "d": "2026-12-31",
+  "m": "",
+  "e": "New Year's Eve Event Activation",
+  "c": "Natalie Nardo – Wollongong City Council",
+  "n": "",
+  "s": "enquiry",
+  "k": "L21"
+ },
+ {
+  "d": "2027-01-08",
+  "m": "",
+  "e": "Ryde River Walks",
+  "c": "City of Ryde (Katie Brown)",
+  "n": "",
+  "s": "",
+  "k": "L22"
+ },
+ {
+  "d": "2027-01-11",
+  "m": "",
+  "e": "Silent Disco (Session 1)",
+  "c": "Megan - Bomaderry (Crowdpleaser)",
+  "n": "",
+  "s": "",
+  "k": "L23"
+ },
+ {
+  "d": "2027-01-11",
+  "m": "",
+  "e": "Silent Disco (Session 2)",
+  "c": "Megan - Bomaderry (Crowdpleaser)",
+  "n": "",
+  "s": "",
+  "k": "L24"
+ },
+ {
+  "d": "2027-01-23",
+  "m": "",
+  "e": "Hens Party Walk",
+  "c": "Kaylie's Hens Party (Ali Rose)",
+  "n": "",
+  "s": "",
+  "k": "L25"
+ },
+ {
+  "d": "2027-02-05",
+  "m": "",
+  "e": "Ryde River Walks",
+  "c": "City of Ryde (Katie Brown)",
+  "n": "",
+  "s": "",
+  "k": "L26"
+ },
+ {
+  "d": "2027-02-06",
+  "m": "",
+  "e": "Hens Party Walk",
+  "c": "Danielle's Hens Party (Sarah Keane)",
+  "n": "",
+  "s": "",
+  "k": "L27"
+ },
+ {
+  "d": "2027-02-20",
+  "m": "",
+  "e": "Disability Disco",
+  "c": "David",
+  "n": "",
+  "s": "",
+  "k": "L28"
+ },
+ {
+  "d": "2027-03-05",
+  "m": "",
+  "e": "Ryde River Walks",
+  "c": "City of Ryde (Katie Brown)",
+  "n": "",
+  "s": "",
+  "k": "L29"
+ },
+ {
+  "d": "2027-03-06",
+  "m": "",
+  "e": "Hens Party Walk",
+  "c": "Kristy MacKellar",
+  "n": "",
+  "s": "",
+  "k": "L30"
+ },
+ {
+  "d": "2027-05-15",
+  "m": "",
+  "e": "Disability Disco",
+  "c": "David",
+  "n": "",
+  "s": "",
+  "k": "L31"
+ },
+ {
+  "d": "2027-08-21",
+  "m": "",
+  "e": "Disability Disco",
+  "c": "David",
+  "n": "",
+  "s": "",
+  "k": "L32"
+ },
+ {
+  "d": "2027-11-20",
+  "m": "",
+  "e": "Disability Disco",
+  "c": "David",
+  "n": "",
+  "s": "",
+  "k": "L33"
+ }
+];
+
+const FILTERS = [
+  { id:'ALL',   label:'All' },
+  { id:'KIDS',  label:'Kids Party' },
+  { id:'HENS',  label:'Hens Party' },
+  { id:'OTHER', label:'Other bookings' },
+];
+
+function bookingType(c){
+  const cat = (state.categories || []).find(x => x.id === c.categoryId);
+  const text = (c.eventType ? c.eventType : ((cat && cat.name) || c.client || '')).toLowerCase();
+  if(/\bkid'?s?\s+party/.test(text)) return 'KIDS';
+  if(/\bhen'?s?\s+party/.test(text)) return 'HENS';
+  return 'OTHER';
+}
+
+function applyFilter(items){
+  return activeFilter === 'ALL' ? items : items.filter(c => bookingType(c) === activeFilter);
+}
+
+function sortKey(c){ return c.eventDate || (c.eventMonth ? c.eventMonth + '-99' : ''); }
+
+function byDateUndatedLast(a, b){
+  const ka = sortKey(a), kb = sortKey(b);
+  if(!ka && !kb) return 0;
+  if(!ka) return 1;
+  if(!kb) return -1;
+  return ka > kb ? 1 : (ka < kb ? -1 : 0);
+}
+
+function isUpcoming(c){
   const todayISO = todayLocalISO();
-  const upcoming = state.cards
-    .filter(c => c.eventDate && c.eventDate >= todayISO && (c.status === 'confirmed' || c.status === 'staffed'))
-    .sort((a, b) => (a.eventDate > b.eventDate ? 1 : a.eventDate < b.eventDate ? -1 : 0));
+  if(c.eventDate) return c.eventDate >= todayISO;
+  if(c.eventMonth) return c.eventMonth >= todayISO.slice(0, 7);
+  return true;
+}
 
-  if(upcoming.length === 0){
-    board.innerHTML = `<div class="empty-col" style="width:100%; max-width:400px;">No confirmed bookings yet</div>`;
-    return;
+function getConfirmedUpcoming(){
+  return state.cards.filter(c => CONFIRMED_VIEW_STATUSES.includes(c.status) && isUpcoming(c)).sort(byDateUndatedLast);
+}
+
+function getPencilledIn(){
+  return state.cards.filter(c => PENCILLED_STATUSES.includes(c.status) && isUpcoming(c)).sort(byDateUndatedLast);
+}
+
+function currentBaseItems(){
+  return activeTab === 'CONFIRMED' ? getConfirmedUpcoming() : getPencilledIn();
+}
+
+function monthKeyOf(c){
+  return c.eventDate ? c.eventDate.slice(0, 7) : (c.eventMonth || 'none');
+}
+
+function monthParts(ym){
+  const d = new Date(ym + '-01T00:00:00');
+  return { name: d.toLocaleDateString('en-AU', { month:'long' }).toUpperCase(), year: String(d.getFullYear()) };
+}
+
+function dateChipHtml(c){
+  if(c.eventDate){
+    const d = new Date(c.eventDate + 'T00:00:00');
+    if(!isNaN(d)){
+      return `<div class="row-date"><div class="rd-day">${String(d.getDate()).padStart(2, '0')}</div><div class="rd-dow">${d.toLocaleDateString('en-AU', { weekday:'short' }).toUpperCase()}</div></div>`;
+    }
   }
+  return `<div class="row-date tbc"><div class="rd-day">TBC</div><div class="rd-dow">DATE</div></div>`;
+}
 
+function renderFilterBar(){
+  const bar = document.getElementById('filterBar');
+  const base = currentBaseItems();
+  bar.innerHTML = '';
+  FILTERS.forEach(f => {
+    const count = f.id === 'ALL' ? base.length : base.filter(c => bookingType(c) === f.id).length;
+    const el = document.createElement('button');
+    el.className = 'filter-chip type-' + f.id.toLowerCase() + (activeFilter === f.id ? ' active' : '');
+    el.innerHTML = `${f.id === 'ALL' ? '' : '<span class="fc-dot"></span>'}${f.label} <span class="fc-count">${count}</span>`;
+    el.addEventListener('click', () => { activeFilter = f.id; render(); });
+    bar.appendChild(el);
+  });
+}
+
+function bookingRowHtml(c){
+  const statusObj = STATUSES.find(s => s.id === c.status);
+  const timeRange = [c.eventTime, c.eventEndTime].filter(Boolean).join(' – ');
+  const metaLine = [c.eventType, timeRange, (!c.eventDate ? 'Date to be confirmed' : '')].filter(Boolean).join(' · ');
+  const tags = [];
+  if(c.pax) tags.push(`${c.pax} pax`);
+  if(c.price) tags.push(c.price);
+  if(c.source) tags.push(`via ${c.source}`);
+  if(parseFloat(c.extraCount) > 0) tags.push(`+${c.extraCount} extra (${formatMoney(extraTotal(c))})`);
+  return `
+    <div class="all-booking-row type-${bookingType(c).toLowerCase()}" data-id="${c.id}">
+      ${dateChipHtml(c)}
+      <div class="all-booking-main">
+        <div class="card-client">${escapeHtml(c.client)}</div>
+        ${metaLine ? `<div class="card-line">${escapeHtml(metaLine)}</div>` : ''}
+        ${c.location ? `<div class="card-line">${escapeHtml(c.location)}</div>` : ''}
+        ${c.staff ? `<div class="card-line">Staff: ${escapeHtml(c.staff)}</div>` : ''}
+        ${c.notes ? `<div class="card-line row-notes">${escapeHtml(c.notes)}</div>` : ''}
+        ${tags.length ? `<div class="card-tags">${tags.map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+        ${invoiceBadgeHtml(c)}
+        ${checklistBadgeHtml(c)}
+        ${followupIndicatorHtml(c)}
+      </div>
+      <span class="card-tag">${escapeHtml(statusObj ? statusObj.label : c.status)}</span>
+    </div>
+  `;
+}
+
+function upcomingSectionHtml(title, subtitle, cls, items, emptyText){
   const groups = [];
-  upcoming.forEach(c => {
-    const monthKey = c.eventDate.slice(0, 7);
+  items.forEach(c => {
+    const key = monthKeyOf(c);
     let group = groups[groups.length - 1];
-    if(!group || group.key !== monthKey){
-      group = { key: monthKey, label: monthLabel(c.eventDate), items: [] };
+    if(!group || group.key !== key){
+      group = { key, items: [] };
       groups.push(group);
     }
     group.items.push(c);
   });
 
-  let html = '';
-  groups.forEach(group => {
-    html += `<div class="month-header"><span>${group.label}</span><span class="month-count">${group.items.length} booking${group.items.length === 1 ? '' : 's'}</span></div>`;
-    group.items.forEach(c => {
-      const cat = state.categories.find(cc => cc.id === c.categoryId) || { name:'', color:'pink' };
-      const statusObj = STATUSES.find(s => s.id === c.status);
-      const timeRange = [c.eventTime, c.eventEndTime].filter(Boolean).join(' – ');
-      const metaLine = [cat.name, formatDate(c.eventDate), timeRange].filter(Boolean).join(' · ');
-      html += `
-        <div class="all-booking-row" data-id="${c.id}" style="border-left-color:${cardColor(c, cat)}">
-          <div class="all-booking-main">
-            <div class="card-client">${escapeHtml(c.client)}</div>
-            <div class="card-line">${escapeHtml(metaLine)}</div>
-            ${c.location ? `<div class="card-line">${escapeHtml(c.location)}</div>` : ''}
-          </div>
-          <span class="card-tag">${escapeHtml(statusObj ? statusObj.label : c.status)}</span>
-        </div>
-      `;
+  let body = '';
+  if(items.length === 0){
+    body = `<div class="empty-col">${emptyText}</div>`;
+  } else {
+    groups.forEach(group => {
+      let head;
+      if(group.key === 'none'){
+        head = `<span class="month-name">DATE TBC</span>`;
+      } else {
+        const mp = monthParts(group.key);
+        head = `<span class="month-name">${mp.name}<span class="month-year"> ${mp.year}</span></span>`;
+      }
+      body += `
+        <div class="month-block">
+          <div class="month-head">${head}<span class="month-count">${group.items.length} booking${group.items.length === 1 ? '' : 's'}</span></div>
+          <div class="month-rows">${group.items.map(bookingRowHtml).join('')}</div>
+        </div>`;
     });
-  });
+  }
 
-  board.innerHTML = `<div class="all-bookings-list">${html}</div>`;
+  return `
+    <section class="upcoming-section ${cls}">
+      <div class="section-head">
+        <div>
+          <div class="section-title">${title}</div>
+          <div class="section-sub">${subtitle}</div>
+        </div>
+        <span class="section-count">${items.length}</span>
+      </div>
+      ${body}
+    </section>
+  `;
+}
 
+function renderBoard(){
+  const board = document.getElementById('board');
+  const items = applyFilter(currentBaseItems());
+  const f = FILTERS.find(x => x.id === activeFilter);
+  const html = activeTab === 'CONFIRMED'
+    ? upcomingSectionHtml('Upcoming Bookings', 'Confirmed and coming up', 'confirmed', items,
+        activeFilter === 'ALL' ? 'No confirmed bookings coming up' : `No ${f.label} in the confirmed list`)
+    : upcomingSectionHtml('Tentative Bookings', 'Possible bookings, still waiting on a yes', 'pencilled', items,
+        activeFilter === 'ALL' ? 'No tentative bookings right now' : `No ${f.label} in the tentative list`);
+  board.innerHTML = `<div class="upcoming-single">${html}</div>`;
   board.querySelectorAll('.all-booking-row').forEach(row => {
     row.addEventListener('click', () => {
       const card = state.cards.find(c => c.id === row.dataset.id);
@@ -718,72 +1139,69 @@ function renderAllBookingsView(){
   });
 }
 
-function renderBoard(){
-  const board = document.getElementById('board');
-  if(activeCategoryId === 'ALL'){
-    renderAllBookingsView();
-    return;
-  }
-  board.innerHTML = '';
-  const cat = state.categories.find(c => c.id === activeCategoryId);
-  if(!cat) return;
+function matchesImport(c, b){
+  if((c.client || '').trim().toLowerCase() !== b.c.toLowerCase()) return false;
+  if(c.eventType && c.eventType.toLowerCase() !== b.e.toLowerCase()) return false;
+  if(b.d) return (c.eventDate || '') === b.d;
+  return !c.eventDate ? true : c.eventDate.slice(0, 7) === b.m;
+}
 
-  STATUSES.forEach(status => {
-    const col = document.createElement('div');
-    col.className = 'column' + (CLOSED_STATUSES.includes(status.id) ? ' closed' : '');
-    col.dataset.status = status.id;
+function findImported(b){
+  return state.cards.find(c => c.importKey === b.k) || state.cards.find(c => matchesImport(c, b));
+}
 
-    const cardsHere = state.cards.filter(c => c.categoryId === cat.id && c.status === status.id);
-    if(status.id === 'confirmed'){
-      cardsHere.sort((a, b) => {
-        if(!a.eventDate && !b.eventDate) return 0;
-        if(!a.eventDate) return 1;
-        if(!b.eventDate) return -1;
-        return a.eventDate > b.eventDate ? 1 : (a.eventDate < b.eventDate ? -1 : 0);
-      });
-    }
+function missingImports(){
+  return IMPORT_BOOKINGS.filter(b => !(state.dismissedKeys || []).includes(b.k) && !findImported(b));
+}
 
-    col.innerHTML = `
-      <div class="column-head">
-        <span class="column-title">${status.label}</span>
-        <span class="column-count">${cardsHere.length}</span>
-      </div>
-      <div class="card-list"></div>
-    `;
-
-    const list = col.querySelector('.card-list');
-    if(cardsHere.length === 0){
-      const empty = document.createElement('div');
-      empty.className = 'empty-col';
-      empty.textContent = status.id === 'enquiry' ? 'New bookings land here' : 'Drop a booking here';
-      list.appendChild(empty);
-    }
-    cardsHere.forEach(card => list.appendChild(renderCard(card, cat)));
-
-    if(status.id === 'completed' && cardsHere.length > 0){
-      const total = cardsHere.reduce((sum, c) => sum + parsePrice(c.price) + extraTotal(c), 0);
-      const footer = document.createElement('div');
-      footer.className = 'column-footer';
-      footer.textContent = `Total: ${formatMoney(total)}`;
-      col.appendChild(footer);
-    }
-
-    if(!isViewer){
-      col.addEventListener('dragover', (e) => { e.preventDefault(); col.classList.add('drag-over'); });
-      col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
-      col.addEventListener('drop', (e) => {
-        e.preventDefault();
-        col.classList.remove('drag-over');
-        if(draggedCardId){
-          const c = state.cards.find(c => c.id === draggedCardId);
-          if(c && c.status !== status.id){ c.status = status.id; c.updatedAt = Date.now(); saveState(); render(); }
-        }
-      });
-    }
-
-    board.appendChild(col);
+function fixesPending(){
+  if((state.importedBatches || []).includes(IMPORT_BATCH_ID)) return false;
+  return IMPORT_BOOKINGS.some(b => {
+    const c = findImported(b);
+    return c && ((b.s && c.status === 'confirmed') || (b.m && !c.eventDate && !c.eventMonth));
   });
 }
+
+function importConfirmedList(){
+  if(loadFailed){ setBanner(LOAD_FAILED_MSG); showToast('Not added — the board could not load your data'); return; }
+  if(!state.importedBatches) state.importedBatches = [];
+  const applyFixes = !state.importedBatches.includes(IMPORT_BATCH_ID);
+  const catId = state.categories.length ? state.categories[0].id : '';
+  let added = 0, updated = 0;
+  IMPORT_BOOKINGS.forEach(b => {
+    if((state.dismissedKeys || []).includes(b.k)) return;
+    const existing = findImported(b);
+    if(existing){
+      if(!existing.importKey) existing.importKey = b.k;
+      if(applyFixes){
+        if(b.s && existing.status === 'confirmed'){ existing.status = b.s; existing.updatedAt = Date.now(); updated++; }
+        if(b.m && !existing.eventDate && !existing.eventMonth){
+          existing.eventMonth = b.m;
+          if(existing.notes === 'Dec 2026 (TBC)') existing.notes = '';
+          updated++;
+        }
+      }
+      return;
+    }
+    state.cards.push({
+      id: uid(), importKey: b.k, categoryId: catId, status: b.s || 'confirmed', updatedAt: Date.now(),
+      client: b.c, eventType: b.e, eventDate: b.d, eventMonth: b.m || '', notes: b.n || ''
+    });
+    added++;
+  });
+  if(applyFixes) state.importedBatches.push(IMPORT_BATCH_ID);
+  activeTab = 'CONFIRMED';
+  render();
+  const parts = [];
+  if(added) parts.push(`${added} added`);
+  if(updated) parts.push(`${updated} updated`);
+  saveState(ok => {
+    if(ok) showToast(parts.length ? `Saved ✓ — bookings list: ${parts.join(', ')}` : 'Bookings list was already up to date');
+  });
+}
+
+const PENCILLED_STATUSES = ['enquiry', 'quoted', 'awaiting', 'awaiting_response'];
+const CONFIRMED_VIEW_STATUSES = ['confirmed', 'staffed'];
 
 function invoiceBadgeHtml(card){
   const badges = [];
@@ -801,55 +1219,8 @@ function checklistBadgeHtml(card){
   return badges.length ? `<div class="card-tags">${badges.join('')}</div>` : '';
 }
 
-function cardColor(card, cat){
-  return COLOR_HEX[card.color || (cat ? cat.color : 'pink')];
-}
-
-function renderCard(card, cat){
-  const el = document.createElement('div');
-  el.className = 'card' + (isOverdue(card) ? ' overdue' : '');
-  el.draggable = !isViewer;
-  el.style.borderLeftColor = cardColor(card, cat);
-
-  const timeRange = [card.eventTime, card.eventEndTime].filter(Boolean).join(' – ');
-  const dateLine = [formatDate(card.eventDate), timeRange].filter(Boolean).join(' · ');
-  const tags = [];
-  if(card.pax) tags.push(`${card.pax} pax`);
-  if(card.price) tags.push(card.price);
-  if(card.source) tags.push(`via ${card.source}`);
-  if(parseFloat(card.extraCount) > 0) tags.push(`+${card.extraCount} extra (${formatMoney(extraTotal(card))})`);
-
-  el.innerHTML = `
-    ${!isViewer ? '<button class="card-del" title="Delete booking">✕</button>' : ''}
-    <div class="card-client">${escapeHtml(card.client)}</div>
-    ${dateLine ? `<div class="card-line">${escapeHtml(dateLine)}</div>` : ''}
-    ${card.location ? `<div class="card-line">${escapeHtml(card.location)}</div>` : ''}
-    ${card.staff ? `<div class="card-line">Staff: ${escapeHtml(card.staff)}</div>` : ''}
-    ${tags.length ? `<div class="card-tags">${tags.map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
-    ${invoiceBadgeHtml(card)}
-    ${checklistBadgeHtml(card)}
-    ${followupIndicatorHtml(card)}
-  `;
-
-  if(!isViewer){
-    el.addEventListener('dragstart', () => { draggedCardId = card.id; el.classList.add('dragging'); });
-    el.addEventListener('dragend', () => { el.classList.remove('dragging'); draggedCardId = null; });
-    el.querySelector('.card-del').addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      openConfirmModal(`Remove ${card.client} from the pipeline?`, () => {
-        state.cards = state.cards.filter(c => c.id !== card.id);
-        saveState(); render();
-      });
-    });
-    el.addEventListener('click', (e) => {
-      if(e.target.closest('.card-del')) return;
-      openBookingModal(card);
-    });
-  } else {
-    el.addEventListener('click', () => openBookingModal(card));
-  }
-  return el;
+function cardColor(card){
+  return { KIDS:'var(--amber)', HENS:'var(--pink)', OTHER:'var(--sky)' }[bookingType(card)];
 }
 
 function escapeHtml(str){
@@ -925,7 +1296,6 @@ function wireColorPicker(container, initial, onChange){
 function openBookingModal(card){
   const root = document.getElementById('modalRoot');
   const editing = !!card;
-  const cat = state.categories.find(c => c.id === (card ? card.categoryId : activeCategoryId));
 
   if(isViewer){
     const timeRange = [card.eventTime, card.eventEndTime].filter(Boolean).join(' – ');
@@ -933,9 +1303,10 @@ function openBookingModal(card){
       <div class="overlay" id="overlay">
         <div class="modal">
           <h2>${escapeHtml(card.client)}</h2>
-          <div class="readonly-row"><span>Category</span>${escapeHtml(cat.name)}</div>
+          <div class="readonly-row"><span>Event</span>${escapeHtml(card.eventType || '—')}</div>
+          <div class="readonly-row"><span>Status</span>${escapeHtml((STATUSES.find(x => x.id === card.status) || {label: card.status}).label)}</div>
           <div class="readonly-row"><span>Source</span>${escapeHtml(card.source || '—')}</div>
-          <div class="readonly-row"><span>Date</span>${escapeHtml(formatDate(card.eventDate) || '—')}</div>
+          <div class="readonly-row"><span>Date</span>${escapeHtml(formatDate(card.eventDate) || (card.eventMonth ? monthParts(card.eventMonth).name.charAt(0) + monthParts(card.eventMonth).name.slice(1).toLowerCase() + ' ' + monthParts(card.eventMonth).year + ' (date to be confirmed)' : '—'))}</div>
           <div class="readonly-row"><span>Time</span>${escapeHtml(timeRange || '—')}</div>
           <div class="readonly-row"><span>Location</span>${escapeHtml(card.location || '—')}</div>
           <div class="readonly-row"><span>PAX</span>${escapeHtml(card.pax || '—')}</div>
@@ -952,27 +1323,38 @@ function openBookingModal(card){
     return;
   }
 
-  const initialColor = editing ? (card.color || cat.color) : cat.color;
+  const initialStatusChoice = (editing ? CONFIRMED_VIEW_STATUSES.includes(card.status) : activeTab === 'CONFIRMED') ? 'confirmed' : 'not_confirmed';
 
   root.innerHTML = `
     <div class="overlay" id="overlay">
       <div class="modal">
-        <h2>${editing ? 'Edit booking' : `Add booking — ${escapeHtml(cat.name)}`}</h2>
+        <h2>${editing ? 'Edit booking' : (activeTab === 'CONFIRMED' ? 'Add confirmed booking' : 'Add tentative booking')}</h2>
         <div class="field">
           <label for="f-client">Client name</label>
           <input id="f-client" type="text" placeholder="e.g. Sarah Nguyen" value="${editing ? escapeHtml(card.client) : ''}">
+        </div>
+        <div class="field">
+          <label for="f-event-type">Event type</label>
+          <input id="f-event-type" type="text" placeholder="e.g. Silent Disco, Kids Party" value="${editing ? escapeHtml(card.eventType || '') : ''}">
+        </div>
+        <div class="field">
+          <label for="f-status">Booking status</label>
+          <select id="f-status">
+            <option value="confirmed" ${initialStatusChoice === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+            <option value="not_confirmed" ${initialStatusChoice === 'not_confirmed' ? 'selected' : ''}>Tentative</option>
+          </select>
         </div>
         <div class="field">
           <label for="f-source">Booking source</label>
           <select id="f-source">${sourceOptionsHtml(editing ? card.source : '')}</select>
         </div>
         <div class="field">
-          <label>Card colour</label>
-          ${colorPickerHtml(initialColor)}
-        </div>
-        <div class="field">
           <label for="f-date">Event date</label>
           <input id="f-date" type="date" value="${editing ? escapeHtml(card.eventDate || '') : ''}">
+        </div>
+        <div class="field">
+          <label for="f-month">No exact date yet? Pick the month instead</label>
+          <input id="f-month" type="month" value="${editing ? escapeHtml(card.eventMonth || '') : ''}">
         </div>
         <div class="field-row">
           <div class="field">
@@ -1010,11 +1392,10 @@ function openBookingModal(card){
           </div>
           <div class="card-line" id="extraTotalPreview">Extra total: $0.00</div>
         </div>
-        ${(editing && (card.status === 'staffed' || card.status === 'completed')) ? `
         <div class="field">
           <label for="f-staff">Staff assigned</label>
-          <input id="f-staff" type="text" placeholder="e.g. Sarah, Mike" value="${escapeHtml(card.staff || '')}">
-        </div>` : ''}
+          <input id="f-staff" type="text" placeholder="e.g. Sarah, Mike" value="${editing ? escapeHtml(card.staff || '') : ''}">
+        </div>
         ${invoiceFieldsHtml(editing ? card : null)}
         <div class="field">
           <label for="f-notes">Notes</label>
@@ -1034,8 +1415,6 @@ function openBookingModal(card){
     </div>
   `;
 
-  const getChosenColor = wireColorPicker(document.getElementById('cardColorPicker'), initialColor, () => {});
-
   const extraCountEl = document.getElementById('f-extra-count');
   const extraRateEl = document.getElementById('f-extra-rate');
   const extraPreviewEl = document.getElementById('extraTotalPreview');
@@ -1054,6 +1433,7 @@ function openBookingModal(card){
   if(editing){
     document.getElementById('deleteBtn').onclick = () => {
       openConfirmModal(`Remove ${card.client} from the pipeline?`, () => {
+        if(card.importKey){ if(!state.dismissedKeys) state.dismissedKeys = []; state.dismissedKeys.push(card.importKey); }
         state.cards = state.cards.filter(c => c.id !== card.id);
         saveState(); render();
       });
@@ -1070,8 +1450,9 @@ function openBookingModal(card){
     if(!client){ showToast('Add a client name first'); return; }
     const data = {
       client,
+      eventType: document.getElementById('f-event-type').value.trim(),
+      eventMonth: document.getElementById('f-date').value ? '' : document.getElementById('f-month').value,
       source: document.getElementById('f-source').value,
-      color: getChosenColor(),
       eventDate: document.getElementById('f-date').value,
       eventTime: document.getElementById('f-time').value.trim(),
       eventEndTime: document.getElementById('f-endtime').value.trim(),
@@ -1090,12 +1471,15 @@ function openBookingModal(card){
     };
     const staffEl = document.getElementById('f-staff');
     data.staff = staffEl ? staffEl.value.trim() : (editing ? (card.staff || '') : '');
+    const statusChoice = document.getElementById('f-status').value;
+    const toStatus = statusChoice === 'confirmed' ? 'confirmed' : 'enquiry';
     if(editing){
       Object.assign(card, data);
+      if(statusChoice !== initialStatusChoice){ card.status = toStatus; }
       card.updatedAt = Date.now();
     } else {
       state.cards.push({
-        id: uid(), categoryId: activeCategoryId, status: 'enquiry',
+        id: uid(), categoryId: (state.categories[0] ? state.categories[0].id : ''), status: toStatus,
         updatedAt: Date.now(), ...data
       });
     }
@@ -1104,60 +1488,6 @@ function openBookingModal(card){
     render();
   };
   document.getElementById('f-client').focus();
-}
-
-function openAddCategoryModal(){
-  const root = document.getElementById('modalRoot');
-  let chosen = nextColor();
-  root.innerHTML = `
-    <div class="overlay" id="overlay">
-      <div class="modal">
-        <h2>Add category</h2>
-        <div class="field">
-          <label for="f-catname">Category name</label>
-          <input id="f-catname" type="text" placeholder="e.g. Corporate Events">
-        </div>
-        <div class="field">
-          <label>Colour</label>
-          <div class="color-picker" id="colorPicker"></div>
-        </div>
-        <div class="field">
-          <label for="f-catnote">Package note (optional, one line per point)</label>
-          <textarea id="f-catnote" class="note-textarea" placeholder="Package price, inclusions, T&amp;Cs reminder..."></textarea>
-        </div>
-        <div class="modal-actions"><div></div><div class="modal-actions-right">
-          <button class="btn-ghost" id="cancelBtn">Cancel</button>
-          <button class="btn-primary" id="saveCatBtn">Add category</button>
-        </div></div>
-      </div>
-    </div>
-  `;
-  const picker = document.getElementById('colorPicker');
-  PALETTE.forEach(color => {
-    const sw = document.createElement('div');
-    sw.className = 'swatch' + (color === chosen ? ' selected' : '');
-    sw.style.background = COLOR_HEX[color];
-    sw.onclick = () => {
-      chosen = color;
-      picker.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
-      sw.classList.add('selected');
-    };
-    picker.appendChild(sw);
-  });
-  document.getElementById('cancelBtn').onclick = closeModal;
-  document.getElementById('overlay').addEventListener('click', (e) => { if(e.target.id === 'overlay') closeModal(); });
-  document.getElementById('saveCatBtn').onclick = () => {
-    const name = document.getElementById('f-catname').value.trim();
-    if(!name){ showToast('Give the category a name'); return; }
-    const note = document.getElementById('f-catnote').value.trim();
-    const newCat = { id: uid(), name, color: chosen, note };
-    state.categories.push(newCat);
-    activeCategoryId = newCat.id;
-    saveState();
-    closeModal();
-    render();
-  };
-  document.getElementById('f-catname').focus();
 }
 
 function closeModal(){ document.getElementById('modalRoot').innerHTML = ''; }
@@ -1176,13 +1506,12 @@ function checkSessionsToday(){
   if(sessions.length === 0) return;
   const root = document.getElementById('modalRoot');
   const rows = sessions.map(c => {
-    const cat = state.categories.find(cc => cc.id === c.categoryId) || { name:'', color:'pink' };
     const time = [c.eventTime, c.eventEndTime].filter(Boolean).join(' – ');
     return `<div class="session-row">
-      <span class="dot" style="background:${cardColor(c, cat)}"></span>
+      <span class="dot" style="background:${cardColor(c)}"></span>
       <div>
-        <div class="session-client">${escapeHtml(c.client)}</div>
-        <div class="session-meta">${escapeHtml(cat.name)}${time ? ' · ' + escapeHtml(time) : ''}${c.location ? ' · ' + escapeHtml(c.location) : ''}</div>
+        <div class="session-client">${escapeHtml(c.client)}${PENCILLED_STATUSES.includes(c.status) ? ' <span class="card-tag">Tentative</span>' : ''}</div>
+        <div class="session-meta">${escapeHtml([c.eventType, time, c.location].filter(Boolean).join(' · '))}</div>
       </div>
     </div>`;
   }).join('');
@@ -1202,11 +1531,13 @@ function checkSessionsToday(){
 async function init(){
   renderViewerBanner();
   await loadState();
-  activeCategoryId = 'ALL';
+  activeTab = 'CONFIRMED';
   render();
-  checkSessionsToday();
+  if(loadFailed) setBanner(LOAD_FAILED_MSG);
   if(!isViewer && !getEditKey()){
-    openEditKeyModal();
+    openEditKeyModal(() => checkSessionsToday(), () => checkSessionsToday());
+  } else {
+    checkSessionsToday();
   }
 }
 
